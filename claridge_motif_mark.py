@@ -9,9 +9,8 @@ import cairo
 import math
 import random
 
-parser = argparse.ArgumentParser(description="Creates a visualization of one or more motifs across a sequence or multiple sequences provided in UCSC format. Requires sequences and a list of motifs to be visualized.")
+parser = argparse.ArgumentParser(description="Creates a visualization of one to seven sequence motifs across a sequence or multiple sequences provided in UCSC format.\nRequires a FASTA file of the sequences to be visualized and a list of motifs to be visualized.\nSince a random color generator is used, if the output color scheme is unfavorable, run script again.")
 parser.add_argument('-f','--fasta', help='absolute path to FASTA file of sequences to be searched (/path/to/<FASTA_FILE>).', required=True, type=str)
-parser.add_argument('-o','--out_dir', help='absolute path to the output directory (/path/to/<OUT_DIR>).', required=False, type=str)
 parser.add_argument('-m','--motifs', help='absolute path to the text file containing the list of motifs to be visualized, formatted as one motif per line (/path/to/<MOTIF_FILE>).', required=True, type=str)
 args = parser.parse_args()
 
@@ -86,6 +85,8 @@ def lengths_intex(sequence):
     sequence = sequence.strip()
     pattern = re.compile(r'([a-z]+)([A-Z]+)([a-z]+)')
     res = re.match(pattern, sequence)
+    if len(res.groups()) != 3:
+        raise ValueError("ERROR: Exiting program. Sequence is not in UCSC format.")
     lengths = [sequence, len(sequence), len(res.group(1)), len(res.group(2)), len(res.group(3))]
     return lengths
 
@@ -164,19 +165,19 @@ def draw_title(start, gene, info):
     # draw gene name
     context.set_font_size(15)    
     context.set_source_rgb(0, 0, 0)
-    context.move_to(start[0] - 275, start[1] - 5)
+    context.move_to(start[0] - 325, start[1] - 5)
     context.show_text(gene)
     
     # draw sequence information
     context.set_font_size(10)
-    context.move_to(start[0] - 275, start[1] + 5)
+    context.move_to(start[0] - 325, start[1] + 5)
     context.show_text(info)
 
 def draw_legend(start, motif, r, g, b):
     '''Draws in the colored motif legend.'''
     context.set_source_rgb(r, g, b)
     context.set_line_width(18)
-    context.move_to(start[0] - 275, start[1] + spacing)
+    context.move_to(start[0] - 325, start[1] + spacing)
     context.show_text(motif)
 
 def draw_motif(start, motif_position):
@@ -197,7 +198,7 @@ def draw_motif(start, motif_position):
 
 # set limit for number of motifs; too many motifs gets really messy
 if count_lines(args.motifs) > 7:
-    raise ValueError("ERROR: Exiting program. Too many motifs were supplied (maximum 7)")
+    raise ValueError("ERROR: Exiting program. Too many motifs were supplied (maximum 7).")
 
 # convert input fasta to have two lines per entry
 fasta_twofer(args.fasta)   
@@ -234,13 +235,13 @@ all_positions = get_all_positions(fasta_f = "./sequences_twofer.fasta", motif_f 
 #####################################################################################
 
 # set up Cairo surface
-surface_width = longest_sequence("./sequences_twofer.fasta") + 300 + 25
+surface_width = longest_sequence("./sequences_twofer.fasta") + 350 + 25
 surface_height = count_lines("./sequences_twofer.fasta") / 2 * 135
 
 surface = cairo.SVGSurface("./motif_mark.svg", surface_width, surface_height)
 context = cairo.Context(surface)
 context.set_line_width(1)
-start = [300,100] # [x, y]
+start = [350,100] # [x, y]
 
 for one_position in all_positions: # for each sequence...
     # draw the introns and exon
