@@ -236,7 +236,7 @@ all_positions = get_all_positions(fasta_f = "./sequences_twofer.fasta", motif_f 
 
 # set up Cairo surface
 surface_width = longest_sequence("./sequences_twofer.fasta") + 350 + 25
-surface_height = count_lines("./sequences_twofer.fasta") / 2 * 135
+surface_height = count_lines("./sequences_twofer.fasta") / 2 * 200
 
 surface = cairo.SVGSurface("./motif_mark.svg", surface_width, surface_height)
 context = cairo.Context(surface)
@@ -270,7 +270,7 @@ for one_position in all_positions: # for each sequence...
                 draw_motif(start, m)
                 
     # add spacing before next sequence            
-    start = [start[0], start[1] + 100]
+    start = [start[0], start[1] + 150]
 
 surface.finish()
 
